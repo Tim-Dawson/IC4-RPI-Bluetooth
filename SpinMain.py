@@ -137,20 +137,23 @@ def parse_buffer(buffer):
 
 
 def metric_on_screen(data):
-    print(data)
 
     write_metric("Cadence", data['cadence'])
 
-    if display_metric == "Cadence":
+    if (key0.value() == 0):
         write_metric("Cadence", data['cadence'])
-    elif display_metric == "Distance":
-        write_metric("Distance", data['distance'])
-    elif display_metric == "Speed":
+
+    if (key1.value() == 0):
         write_metric("Speed", data['speed'])
-    elif display_metric == "BluetoothStatus":
-        pass
-    else:
-        write_metric("ERROR", "Opps")
+
+    if (key2.value() == 0):
+        write_metric("Distance", data['distance'])
+
+    if (key3.value() == 0):
+        LCD.fill(LCD.BLACK)
+        LCD.write_text("Bluetooth", x=5, y=5, size=1, color=LCD.WHITE)
+        LCD.write_text("connected?", x=5, y=25, size=1, color=LCD.WHITE)
+        LCD.write_text(str(bluetooth_connected), x=30, y=60, size=2, color=LCD.WHITE)
 
 
 def write_metric(title, metric, title_size=2, metric_size=5):
@@ -255,26 +258,10 @@ if __name__ == '__main__':
     key2 = Pin(2, Pin.IN, Pin.PULL_UP)
     key3 = Pin(3, Pin.IN, Pin.PULL_UP)
 
-    while (1):
-        if (key0.value() == 0):
-            display_metric = "Cadence"
 
-        if (key1.value() == 0):
-            display_metric = "Speed"
-
-        if (key2.value() == 0):
-            display_metric = "Distance"
-
-        if (key3.value() == 0):
-            display_metric = "BluetoothStatus"
-            LCD.fill(LCD.BLACK)
-            LCD.write_text("Bluetooth", x=5, y=5, size=1, color=LCD.WHITE)
-            LCD.write_text("connected?", x=5, y=25, size=1, color=LCD.WHITE)
-            LCD.write_text(str(bluetooth_connected), x=30, y=60, size=2, color=LCD.WHITE)
-
-        LCD.show()
-        asyncio.run(main())
-    time.sleep(1)
+    LCD.show()
+    asyncio.run(main())
+    utime.sleep(1)
     LCD.fill(0xFFFF)
 
 
