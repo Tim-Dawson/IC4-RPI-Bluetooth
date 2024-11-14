@@ -39,6 +39,8 @@ _CCCD_UUID = bluetooth.UUID(0x2902)
 PROP_READ = 0x02
 PROP_NOTIFY = 0x10
 
+display_metric = "Cadence"
+
 
 def diff_for_sample(current, previous, max_value):
     if current >= previous:
@@ -138,22 +140,20 @@ def parse_buffer(buffer):
 
 def metric_on_screen(data):
 
-    write_metric("Cadence", data['cadence'])
+    global display_metric
 
-    if (key0.value() == 0):
+    if display_metric == "Cadence":
         write_metric("Cadence", data['cadence'])
-
-    if (key1.value() == 0):
+    elif display_metric == "Speed":
         write_metric("Speed", data['speed'])
-
-    if (key2.value() == 0):
+    elif display_metric == "Distance":
         write_metric("Distance", data['distance'])
-
-    if (key3.value() == 0):
+    elif display_metric == "Bluetooth":
         LCD.fill(LCD.BLACK)
         LCD.write_text("Bluetooth", x=5, y=5, size=1, color=LCD.WHITE)
         LCD.write_text("connected?", x=5, y=25, size=1, color=LCD.WHITE)
         LCD.write_text(str(bluetooth_connected), x=30, y=60, size=2, color=LCD.WHITE)
+        LCD.show()
 
 
 def write_metric(title, metric, title_size=2, metric_size=5):
@@ -165,6 +165,8 @@ def write_metric(title, metric, title_size=2, metric_size=5):
 
 async def main():
     global bt_connection_attempt_count
+    global display_metric
+
     device = await find_spinbike()
     if not device:
         LCD.fill(LCD.BLACK)
@@ -200,6 +202,19 @@ async def main():
 
                 async def notification_handler():
                     while True:
+
+                        if (key0.value() == 0):
+                            display_metric = "Cadence"
+
+                        if (key1.value() == 0):
+                            display_metric = "Speed"
+
+                        if (key2.value() == 0):
+                            display_metric = "Distance"
+
+                        if (key3.value() == 0):
+                            display_metric = "Bluetooth"
+
                         data = await cadence_characteristic.notified()
                         print(f"Buffer received: {data}")
                         sensor_data = parse_buffer(data)
